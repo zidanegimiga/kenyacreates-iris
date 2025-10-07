@@ -45,7 +45,7 @@ export default function Navigation() {
     >
       <div className="flex items-center justify-between sm:px-10 md:px-16 py-3 px-10">
         <a
-          href="https://storyforimpact.io"
+          href="https://storyforimpact.io/projects"
           target="_blank"
           rel="noopener noreferrer"
           className="flex gap-2 sm:gap-4 items-center"
