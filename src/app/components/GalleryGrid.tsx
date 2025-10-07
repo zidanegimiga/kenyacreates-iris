@@ -8,25 +8,25 @@ const GalleryGrid = () => {
     {
       id: 1,
       src: "/outdoor.png",
-      alt: "Outdoor screen setup",
+      alt: "",
       span: "row-span-1 col-span-1",
     },
     {
       id: 2,
       src: "/theatre.png",
-      alt: "Indoor venue",
+      alt: "",
       span: "row-span-1 col-span-1",
     },
     {
       id: 3,
       src: "/long.png",
-      alt: "Person smiling",
+      alt: "",
       span: "row-span-2 col-span-1",
     },
     {
       id: 4,
       src: "/team.png",
-      alt: "Team photo",
+      alt: "",
       span: "row-span-1 col-span-2",
     },
   ]);
