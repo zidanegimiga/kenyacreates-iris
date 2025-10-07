@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 
 const GalleryGrid = () => {
   const [images] = useState([
@@ -28,83 +29,83 @@ const GalleryGrid = () => {
       alt: "Team photo",
       span: "row-span-1 col-span-2",
     },
-    {
-      id: 5,
-      src: "/api/placeholder/400/300",
-      alt: "Screening event",
-      span: "row-span-1 col-span-1",
-    },
   ]);
 
   return (
     <div className="w-full h-fit p-4">
       <div className="max-w-7xl mx-auto h-full p-2">
-        <div
-          className="
-      grid gap-2 h-full
-      grid-cols-1
-      sm:grid-cols-2 sm:grid-rows-2
-      md:grid-cols-3 md:grid-rows-2
-    "
+        <motion.div
+          className="grid gap-2 h-full grid-cols-1 sm:grid-cols-2 sm:grid-rows-2 md:grid-cols-3 md:grid-rows-2"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: { staggerChildren: 0.15 },
+            },
+          }}
         >
-          {/* Top Left - Outdoor screen */}
-          <div className="relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer">
-            <img
-              src={images[0].src}
-              alt={images[0].alt}
-              className="w-full h-64 sm:h-full object-cover"
-            />
-          </div>
-
-          {/* Top Middle - Indoor venue */}
-          <div className="relative overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer">
-            <img
-              src={images[1].src}
-              alt={images[1].alt}
-              className="w-full h-64 sm:h-full object-cover"
-            />
-          </div>
-
-          {/* Top Right & Bottom Right (tall) - Person smiling */}
-          <div className="relative overflow-hidden rounded-lg md:row-span-2 hover:opacity-90 transition-opacity cursor-pointer">
-            <img
-              src={images[2].src}
-              alt={images[2].alt}
-              className="w-full h-80 sm:h-full object-cover"
-            />
-          </div>
-
-          {/* Bottom Left & Bottom Middle (wide) - Team photo */}
-          <div className="relative overflow-hidden rounded-lg sm:col-span-2 hover:opacity-90 transition-opacity cursor-pointer">
-            <img
-              src={images[3].src}
-              alt={images[3].alt}
-              className="w-full h-64 sm:h-full object-cover"
-            />
-          </div>
-        </div>
+          {images.map((img) => (
+            <motion.div
+              key={img.id}
+              className={`relative overflow-hidden rounded-lg ${img.span} cursor-pointer group`}
+              variants={{
+                hidden: { opacity: 0, scale: 0.95, y: 30 },
+                visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+              }}
+              whileHover={{ scale: 1.03 }}
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-64 md:h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <p className="text-white font-gilroy font-bold text-lg">{img.alt}</p>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
 
-      <div className="w-full flex flex-col items-center justify-center gap-10">
-        <p
-          className="uppercase mt-10 text-4xl md:text-6xl font-bold font-myona text-center"
+      {/* Text Section */}
+      <div className="w-full flex flex-col items-center justify-center gap-10 relative z-10">
+        <motion.p
+          className="uppercase mt-10 text-4xl md:text-5xl font-bold font-myona text-center relative"
           style={{ fontFamily: "Myona-Sans" }}
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           OUR WHY
-        </p>
-        <p className="text-center w-2/3  md:text-xl">
+        </motion.p>
+
+        <motion.p
+          className="text-center w-2/3 md:text-xl text-white/90 leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+        >
           For too long, reproductive health has been framed in a way that feels
           impersonal and inaccessible. Kenya Creates is here to change that. Our
           films speak to the heart, addressing the real barriers young people
           face while providing tools to navigate life with confidence. It’s not
           about dictating choices; it’s about recognizing what’s real and
           centering it to spark conversations that feel natural and empowering.
-        </p>
+        </motion.p>
 
-        <a href="https://kenyacreates.org">
-          <div className="bg-[#4C565C] rounded-full px-8 py-2  border border-white flex items-center justify-center gap-4 font-bold font-gilroy text-base cursor-pointer">
-            Check out KENYA CREATES
-            <div className="flex items-center">
+        {/* CTA */}
+        <motion.a
+          href="https://kenyacreates.org"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.97 }}
+          transition={{ type: "spring", stiffness: 200, damping: 12 }}
+        >
+          <div className="bg-[#4C565C] rounded-full px-8 py-3 border border-white flex items-center justify-center gap-4 font-bold font-gilroy text-base text-white shadow-lg hover:shadow-xl hover:bg-[#5C676E] transition-all">
+            <div>Check out KENYA CREATES</div>
+            <div>
               <svg
                 width="32"
                 height="32"
@@ -137,10 +138,16 @@ const GalleryGrid = () => {
               </svg>
             </div>
           </div>
-        </a>
+        </motion.a>
       </div>
     </div>
   );
 };
 
 export default GalleryGrid;
+
+
+
+
+
+              
