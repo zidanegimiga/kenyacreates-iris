@@ -1,16 +1,16 @@
 /* Hero.module.css */
 
 .heroWrapper {
-    background-image: url('/bgImage.png');
-    background-size: cover;
-    background-position: center;
-    /* height: 100vh; */
+  background-image: url('/bgImage.png');
+  background-size: cover;
+  background-position: center;
+  /* height: 100vh; */
 
 }
 
-.bgWrapper{
-    background-color: #313d41be;
-    opacity: 50;
+.bgWrapper {
+  background-color: #313d41be;
+  opacity: 50;
 }
 
 
@@ -26,6 +26,17 @@
   width: 100%;
 }
 
+.goalSection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  /* height: 500px; */
+  overflow: hidden;
+  width: 100%;
+}
+
 .textContainer {
   z-index: 1;
   width: 40%;
@@ -34,7 +45,7 @@
   padding-left: 48px;
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: center;
   height: 100%;
 }
 
@@ -43,7 +54,7 @@
   margin-bottom: 1rem;
   font-family: 'Myona Sans';
   text-align: left;
-  
+
 }
 
 .textContainer p {
@@ -68,4 +79,18 @@
   bottom: 0%;
   right: 8%;
   z-index: 1;
+}
+
+.theorySectionWrapper {
+  background: url('/theoryofchange.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  position: relative;
+  width: 50%;
+  filter: grayscale(100%);
+}
+
+.theorySectionWrapper:hover {
+  filter: grayscale(0%);
 }
