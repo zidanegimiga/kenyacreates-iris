@@ -18,7 +18,7 @@ export default function KenyaCreatesPage() {
         </div>
       </div>
 
-      <TheoryOfChange/>
+      <TheoryOfChange />
 
       {/* SECTION FOUR */}
       <div className="w-full">

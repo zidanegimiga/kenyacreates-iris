@@ -16,12 +16,11 @@ export default function Navigation() {
 
       // detect scroll direction
       if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false); // scrolling down -> hide
+        setIsVisible(false);
       } else {
-        setIsVisible(true); // scrolling up -> show
+        setIsVisible(true);
       }
 
-      // detect if page is scrolled for background
       setIsScrolled(currentScrollY > 100);
 
       setLastScrollY(currentScrollY);
@@ -68,9 +67,15 @@ export default function Navigation() {
         </div>
 
         <div className="hidden sm:flex justify-between gap-3 sm:gap-4 items-center">
-          <FacebookIcon  />
-          <TwitterIcon  />
-          <InstagramIcon />
+          <a href="https://www.instagram.com/irisstoryforimpact/?hl=en">
+            <InstagramIcon />
+          </a>
+          <a href="https://x.com/storyforimpact?lang=en">
+            <TwitterIcon />
+          </a>
+          <a href="https://www.linkedin.com/company/storyforimpact/">
+            <FacebookIcon />
+          </a>
         </div>
       </div>
     </div>
