@@ -1,0 +1,96 @@
+/* Hero.module.css */
+
+.heroWrapper {
+  background-image: url('/bgImage.png');
+  background-size: cover;
+  background-position: center;
+  /* height: 100vh; */
+
+}
+
+.bgWrapper {
+  background-color: #313d41be;
+  opacity: 50;
+}
+
+
+.visionSection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #C2670C;
+  color: white;
+  height: 500px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.goalSection {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+  /* height: 500px; */
+  overflow: hidden;
+  width: 100%;
+}
+
+.textContainer {
+  z-index: 1;
+  width: 40%;
+  padding-bottom: 32px;
+  padding-top: 64px;
+  padding-left: 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.textContainer h2 {
+  font-size: 40px;
+  margin-bottom: 1rem;
+  font-family: 'Myona Sans';
+  text-align: left;
+
+}
+
+.textContainer p {
+  font-size: 20px;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.imageContainer {
+  position: relative;
+  width: 60%;
+  height: 100%;
+}
+
+.backgroundImage {
+  height: 100%;
+  z-index: 0;
+}
+
+.foregroundImage {
+  position: absolute;
+  bottom: 0%;
+  right: 8%;
+  z-index: 1;
+}
+
+.theorySectionWrapper {
+  background: url('/theoryofchange.jpg');
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  position: relative;
+  width: 50%;
+  filter: grayscale(100%);
+}
+
+.theorySectionWrapper:hover {
+  filter: grayscale(0%);
+}
