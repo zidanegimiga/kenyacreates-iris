@@ -1,0 +1,19 @@
+{
+  "initialText": "/initialText.png",
+  "logo": "/TextVector.svg",
+  "heroImage": "/hero.png",
+  "paragraph": "This is the new text nijkkn",
+  "vision": {
+    "title": "More testing 123",
+    "text": "TEEEE monday"
+  },
+  "goal": {
+    "title": "OUR Goal1212121",
+    "text": "122222",
+    "videoUrl": "https://www.youtube.com/watch?v=Gw1OQESCbzw"
+  },
+  "images": {
+    "visionBg": "/vision.png",
+    "visionFg": "/group.png"
+  }
+}
