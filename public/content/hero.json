@@ -1,0 +1,9 @@
+{
+  "initialText": "/initialText.png",
+  "logo": "/TextVector.svg",
+  "heroImage": "/hero.png",
+  "paragraph": "Kenya Creates is a storytelling initiative...",
+  "vision": { "title": "OUR VISION", "text": "We believe..." },
+  "goal": { "title": "OUR Goal", "text": "Kenya Creates is building...", "videoUrl": "https://..." },
+  "images": { "visionBg": "/vision.png", "visionFg": "/group.png" }
+}

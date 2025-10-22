@@ -3,6 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Head from "next/head";
+import EditorPanel from "./components/cms/EditorPanel";
+import { isAuthenticated, logout } from "@/lib/auth";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,6 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <EditorPanel/>
       </body>
     </html>
   );
