@@ -1,0 +1,13 @@
+.heroWrapper {
+  background-image: url('/bgImage.png');
+  background-size: cover;
+  background-position: center;
+  /* height: 100vh; */
+
+}
+
+
+.bgWrapper {
+  background-color: #313d41be;
+  opacity: 50;
+}
