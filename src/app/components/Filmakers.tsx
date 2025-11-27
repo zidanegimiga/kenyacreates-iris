@@ -70,36 +70,61 @@ export default function MeetFilMakers() {
   const [data, setData] = useState<Data>(defaultData);
   const [isCms, setIsCms] = useState(false);
   const { add } = useEditorStore();
+  const [currentPage, setCurrentPage] = useState("");
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const res = await fetch("/api/content/filmmakers");
-        if (res.ok) setData(await res.json());
-      } catch { console.warn("Using default filmmakers"); }
-    };
-    load();
-    setIsCms(window.location.pathname.startsWith("/cms"));
-  }, []);
 
-  const save = (path: (string | number)[], value: any) => {
-    setData(prev => {
-      const copy: any = JSON.parse(JSON.stringify(prev));
-      let node = copy;
-      for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
-      node[path[path.length - 1]] = value;
-      return copy;
-    });
-    add({ section: "filmmakers", path, value });
+useEffect(() => {
+  const getPageFromPath = () => {
+    if (typeof window === "undefined") return "kenyacreates";
+    const parts = window.location.pathname.split("/").filter(Boolean);
+    // if editing via /cms/editor, optionally check a query param ?page=kenyacreates, but fallback:
+    if (parts[0] === "cms") {
+      // you might put the page slug in query or default to kenyacreates for now
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("page") || "kenyacreates";
+    }
+    return parts[0] || "kenyacreates";
   };
+
+  const page = getPageFromPath();
+  // store page into state for use by save and Editable components
+  setCurrentPage(page);
+
+  const load = async () => {
+    try {
+      const res = await fetch(`/api/content/${page}/filmmakers`);
+      if (res.ok) setData(await res.json());
+    } catch {
+      console.warn("Using default filmmakers");
+    }
+  };
+  load();
+  setIsCms(window.location.pathname.startsWith("/cms"));
+}, []);
+
+
+const save = (path: (string | number)[], value: any) => {
+  setData(prev => {
+    const copy: any = JSON.parse(JSON.stringify(prev));
+    let node = copy;
+    for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
+    node[path[path.length - 1]] = value;
+    return copy;
+  });
+  add({ page: currentPage, section: "filmmakers", path, value });
+};
 
   return (
     <section className="relative overflow-hidden px-8 md:px-12 lg:px-28 py-20">
       <div className="relative z-10 text-center max-w-[1000px] mx-auto">
         {isCms ? (
           <EditableText
-            section="filmmakers" path={["intro"]} value={data.intro}
-            onSave={v => save(["intro"], v)} onCancel={() => {}}
+            page={currentPage}
+            section="filmmakers"
+            path={["intro"]}
+            value={data.intro}
+            onSave={v => save(["intro"], v)}
+            onCancel={() => {}}
             className="font-gilroy text-xl md:text-2xl font-light text-white/90"
           >
             {data.intro}
@@ -113,6 +138,7 @@ export default function MeetFilMakers() {
 
         {isCms ? (
           <EditableText
+          page={currentPage}
             section="filmmakers" path={["title"]} value={data.title}
             onSave={v => save(["title"], v)} onCancel={() => {}}
             className="uppercase mt-10 text-4xl md:text-5xl font-bold font-myona text-white tracking-wide"
@@ -143,6 +169,7 @@ export default function MeetFilMakers() {
               {isCms ? (
                 <div className="space-y-3">
                   <EditableImage
+                  page={currentPage}
                     section="filmmakers"
                     path={["makers", i, "imageSrc"]}
                     src={m.imageSrc}
@@ -153,6 +180,7 @@ export default function MeetFilMakers() {
                     onCancel={() => {}}
                   />
                   <EditableText
+                  page={currentPage}
                     section="filmmakers" path={["makers", i, "name"]} value={m.name}
                     onSave={v => save(["makers", i, "name"], v)} onCancel={() => {}}
                     className="text-center font-bold text-white"
@@ -160,6 +188,7 @@ export default function MeetFilMakers() {
                     {m.name}
                   </EditableText>
                   <EditableText
+                  page={currentPage}
                     section="filmmakers" path={["makers", i, "socialUrl"]} value={m.socialUrl}
                     onSave={v => save(["makers", i, "socialUrl"], v)} onCancel={() => {}}
                     className="text-center text-sm text-white/80 underline"

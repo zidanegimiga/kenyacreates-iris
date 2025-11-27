@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Check, X, Upload } from "lucide-react";
 
 type Props = {
+  page: string;
   section: string;
   path: (string | number)[];
   src: string;
@@ -14,11 +15,12 @@ type Props = {
   height?: number;
   fill?: boolean;
   className?: string;
-  onSave?: (path: (string | number)[], newUrl: string) => void;
+  onSave?: (newUrl: string) => void;
   onCancel?: () => void;
 };
 
 export default function EditableImage({
+  page,
   section,
   path,
   src,
@@ -35,8 +37,10 @@ export default function EditableImage({
     const form = new FormData();
     form.append("file", file);
     form.append("path", JSON.stringify(path));
+    // page is part of the URL, but include it in form for redundancy if needed
+    form.append("page", page);
 
-    const res = await fetch(`/api/content/${section}/upload`, {
+    const res = await fetch(`/api/content/${encodeURIComponent(page)}/${encodeURIComponent(section)}/upload`, {
       method: "POST",
       headers: { Authorization: `Bearer ${process.env.NEXT_PUBLIC_CMS_PASSWORD}` },
       body: form,
@@ -44,13 +48,16 @@ export default function EditableImage({
 
     if (res.ok) {
       const { url } = await res.json();
-      // @ts-ignore
-      onSave(url);
+      onSave?.(url);
       setEditing(false);
+    } else {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      console.error("Upload failed:", err);
+      alert("Upload failed. Check console.");
     }
   };
 
-  if (!window.location.pathname.startsWith("/cms")) {
+  if (typeof window === "undefined" || !window.location.pathname.startsWith("/cms")) {
     return <Image src={src} alt={alt} {...rest} />;
   }
 
@@ -87,8 +94,7 @@ export default function EditableImage({
         onClick={() => {
           setFile(null);
           setEditing(false);
-          // @ts-ignore
-          onCancel();
+          onCancel?.();
         }}
         className="text-red-600 hover:text-red-800"
       >

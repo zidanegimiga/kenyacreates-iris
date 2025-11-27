@@ -6,6 +6,7 @@ import { Check, X } from "lucide-react";
 import { useEditorStore } from "@/lib/useContent";
 
 type Props = {
+  page: string; // NEW
   section: string;
   path: (string | number)[];
   value: string;
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export default function EditableText({
+  page,
   section,
   path,
   value,
@@ -31,13 +33,13 @@ export default function EditableText({
   const { add } = useEditorStore();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  if (!window.location.pathname.startsWith("/cms")) {
+  if (typeof window === "undefined" || !window.location.pathname.startsWith("/cms")) {
     return <span className={className}>{children}</span>;
   }
 
   const handleSave = () => {
     if (temp !== value) {
-      add({ section, path, value: temp });
+      add({ page, section, path, value: temp });
       onSave(temp);
     }
     setEditing(false);
@@ -56,6 +58,7 @@ export default function EditableText({
         onClick={() => {
           setEditing(true);
           setTemp(value);
+          setTimeout(() => inputRef.current?.focus(), 0);
         }}
         style={style}
       >
