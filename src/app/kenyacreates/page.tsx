@@ -1,3 +1,4 @@
+// src/app/kenyacreates/page.tsx
 import HeroSection from "../components/HeroSection";
 import Navigation from "../components/Navigation";
 import styles from "./kenyacreates.module.css";

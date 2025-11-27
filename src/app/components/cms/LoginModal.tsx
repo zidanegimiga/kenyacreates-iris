@@ -1,8 +1,8 @@
+// src/components/cms/LoginModal.tsx
 "use client";
 
 import { useState } from "react";
 import { login } from "@/lib/auth";
-import { useEditorStore } from "@/lib/useContent";
 import { useRouter } from "next/navigation";
 
 export default function LoginModal({ showLogin, setShowLogin }: { showLogin: boolean, setShowLogin: (showLogin: boolean) => void }) {

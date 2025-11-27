@@ -15,19 +15,21 @@ function deepSet(obj: any, path: (string | number)[], value: any): void {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { section: string } }
+  { params }: { params: Promise<{ section: string }> }
 ) {
   try {
-    const data = await getContent(params.section);
+    const { section } = await params; // FIX
+    const data = await getContent(section);
     return NextResponse.json(data);
   } catch {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 }
 
+
 export async function POST(
   req: NextRequest,
-  { params }: { params: { section: string } }
+  { params }: { params: Promise<{ section: string }> }
 ) {
   const auth = req.headers.get("authorization");
   if (auth !== `Bearer ${ADMIN_PASSWORD}`) {
@@ -35,14 +37,16 @@ export async function POST(
   }
 
   try {
+    const { section } = await params; // FIX
+
     const updates = await req.json();
-    const data = await getContent(params.section);
+    const data = await getContent(section);
 
     Array.isArray(updates)
       ? updates.forEach((u: any) => deepSet(data, u.path, u.value))
       : deepSet(data, updates.path, updates.value);
 
-    await saveContent(params.section, data);
+    await saveContent(section, data);
     return NextResponse.json({ success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

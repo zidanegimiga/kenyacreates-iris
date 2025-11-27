@@ -8,22 +8,18 @@ import EditableImage from "./cms/EditableImage";
 import { useEditorStore } from "@/lib/useContent";
 import TwitterIcon, { FacebookIcon, InstagramIcon } from "./icons";
 
-type NavLink = {
-  label: string;
-  href: string;
-};
-
-type SocialLink = {
-  platform: "facebook" | "twitter" | "instagram";
-  url: string;
-};
+type NavLink = { label: string; href: string };
 
 type FooterData = {
   logoSrc: string;
   description: string;
   navigationLinks: NavLink[];
   rightLinks: NavLink[];
-  socialLinks: SocialLink[];
+  social: {
+    facebook: string;
+    twitter: string;
+    instagram: string;
+  };
 };
 
 const defaultData: FooterData = {
@@ -40,11 +36,11 @@ const defaultData: FooterData = {
     { label: "Contact", href: "https://storyforimpact.io/contact" },
     { label: "Careers", href: "https://storyforimpact.io/careers" },
   ],
-  socialLinks: [
-    { platform: "facebook", url: "#facebook" },
-    { platform: "twitter", url: "#twitter" },
-    { platform: "instagram", url: "#instagram" },
-  ],
+  social: {
+    facebook: "https://facebook.com/yourpage",
+    twitter: "https://twitter.com/yourhandle",
+    instagram: "https://instagram.com/yourhandle",
+  },
 };
 
 export default function Footer() {
@@ -56,44 +52,51 @@ export default function Footer() {
     const load = async () => {
       try {
         const res = await fetch("/api/content/footer");
-        if (res.ok) setData(await res.json());
-      } catch {
-        console.warn("Using default footer content");
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+      } catch (e) {
+        console.warn("Failed to load footer content, using defaults");
       }
     };
     load();
     setIsCms(window.location.pathname.startsWith("/cms"));
   }, []);
 
-  const save = (path: (string | number)[], value: any) => {
+  const handleTextSave = (path: (string | number)[], newValue: string) => {
     setData((prev) => {
-      const copy: any = JSON.parse(JSON.stringify(prev));
-      let node = copy;
-      for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
-      node[path[path.length - 1]] = value;
-      return copy;
+      const newData: any = { ...prev };
+      let node: any = newData;
+      for (let i = 0; i < path.length - 1; i++) {
+        node = node[path[i]];
+      }
+      node[path[path.length - 1]] = newValue;
+      return newData;
     });
-    add({ section: "footer", path, value });
+    add({ section: "footer", path, value: newValue });
   };
 
-  const renderSocialIcon = (platform: string) => {
-    switch (platform) {
-      case "facebook":
-        return <FacebookIcon />;
-      case "twitter":
-        return <TwitterIcon />;
-      case "instagram":
-        return <InstagramIcon />;
-      default:
-        return null;
-    }
+  const handleImageSave = (path: (string | number)[], newUrl: string) => {
+    setData((prev) => {
+      const newData: any = { ...prev };
+      let node: any = newData;
+      for (let i = 0; i < path.length - 1; i++) {
+        node = node[path[i]];
+      }
+      node[path[path.length - 1]] = newUrl;
+      return newData;
+    });
+    add({ section: "footer", path, value: newUrl });
   };
+
+  const handleCancel = () => {};
 
   return (
-    <div className="max-w-8xl mx-auto sm:px-4 md:px-12 lg:px-16 py-12 lg:py-16 text-white w-full">
-      {/* Desktop and Tablet Layout */}
+    <footer className="max-w-8xl mx-auto sm:px-4 md:px-12 lg:px-16 py-12 lg:py-16 text-white w-full">
+      {/* Desktop & Tablet */}
       <div className="hidden md:grid md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-        {/* Left Section - Logo and Description */}
+        {/* Left Column */}
         <div className="lg:col-span-1">
           <div className="mb-6">
             {isCms ? (
@@ -101,21 +104,14 @@ export default function Footer() {
                 section="footer"
                 path={["logoSrc"]}
                 src={data.logoSrc}
-                alt="IRIS LOGO"
+                alt="IRIS Logo"
                 width={120}
                 height={39}
-                className="object-contain"
-                onSave={(v) => save(["logoSrc"], v)}
-                onCancel={() => {}}
+                onSave={handleImageSave}
+                onCancel={handleCancel}
               />
             ) : (
-              <Image
-                src={data.logoSrc}
-                alt="IRIS LOGO"
-                title="IRIS LOGO"
-                width={120}
-                height={39}
-              />
+              <Image src={data.logoSrc} alt="IRIS Logo" width={120} height={39} />
             )}
           </div>
 
@@ -124,8 +120,8 @@ export default function Footer() {
               section="footer"
               path={["description"]}
               value={data.description}
-              onSave={(v) => save(["description"], v)}
-              onCancel={() => {}}
+              onSave={(v) => handleTextSave(["description"], v)}
+              onCancel={handleCancel}
               className="text-gray-300 leading-relaxed text-sm lg:text-base"
             >
               {data.description}
@@ -137,60 +133,79 @@ export default function Footer() {
           )}
 
           {/* Social Icons */}
-          <div className="flex gap-4 mt-8">
-            {data.socialLinks.map((social, idx) => (
-              <a
-                key={idx}
-                href={isCms ? undefined : social.url}
-                aria-label={social.platform}
-                className={isCms ? "cursor-default" : "hover:opacity-80 transition-opacity"}
-              >
-                {isCms ? (
-                  <div className="relative group">
-                    {renderSocialIcon(social.platform)}
-                    <EditableText
-                      section="footer"
-                      path={["socialLinks", idx, "url"]}
-                      value={social.url}
-                      onSave={(v) => save(["socialLinks", idx, "url"], v)}
-                      onCancel={() => {}}
-                      className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-white/70 whitespace-nowrap"
-                    >
-                      {social.url}
-                    </EditableText>
-                  </div>
-                ) : (
-                  renderSocialIcon(social.platform)
-                )}
-              </a>
-            ))}
+          <div className="flex gap-6 mt-8">
+            <a href={data.social.facebook} aria-label="Facebook" className="hover:opacity-80 transition">
+              <FacebookIcon />
+            </a>
+            <a href={data.social.twitter} aria-label="Twitter" className="hover:opacity-80 transition">
+              <TwitterIcon />
+            </a>
+            <a href={data.social.instagram} aria-label="Instagram" className="hover:opacity-80 transition">
+              <InstagramIcon />
+            </a>
           </div>
+
+          {/* Social URLs visible only in CMS */}
+          {isCms && (
+            <div className="mt-6 space-y-2 text-xs text-white/60">
+              <EditableText
+                section="footer"
+                path={["social", "facebook"]}
+                value={data.social.facebook}
+                onSave={(v) => handleTextSave(["social", "facebook"], v)}
+                onCancel={handleCancel}
+                className="block"
+              >
+                FB: {data.social.facebook}
+              </EditableText>
+              <EditableText
+                section="footer"
+                path={["social", "twitter"]}
+                value={data.social.twitter}
+                onSave={(v) => handleTextSave(["social", "twitter"], v)}
+                onCancel={handleCancel}
+                className="block"
+              >
+                TW: {data.social.twitter}
+              </EditableText>
+              <EditableText
+                section="footer"
+                path={["social", "instagram"]}
+                value={data.social.instagram}
+                onSave={(v) => handleTextSave(["social", "instagram"], v)}
+                onCancel={handleCancel}
+                className="block"
+              >
+                IG: {data.social.instagram}
+              </EditableText>
+            </div>
+          )}
         </div>
 
-        {/* Middle Section - Navigation Links */}
+        {/* Middle Column - Navigation */}
         <div className="lg:col-span-1">
           <nav className="space-y-4">
-            {data.navigationLinks.map((link, idx) => (
-              <div key={idx} className="block">
+            {data.navigationLinks.map((link, i) => (
+              <div key={i}>
                 {isCms ? (
                   <>
                     <EditableText
                       section="footer"
-                      path={["navigationLinks", idx, "label"]}
+                      path={["navigationLinks", i, "label"]}
                       value={link.label}
-                      onSave={(v) => save(["navigationLinks", idx, "label"], v)}
-                      onCancel={() => {}}
-                      className="text-[#f5a742] hover:text-[#ffb855] transition-colors text-base lg:text-lg font-light border-b border-[#f5a742] pb-1 w-fit block"
+                      onSave={(v) => handleTextSave(["navigationLinks", i, "label"], v)}
+                      onCancel={handleCancel}
+                      className="block text-[#f5a742] hover:text-[#ffb855] transition-colors text-base lg:text-lg font-light border-b border-[#f5a742] pb-1 w-fit"
                     >
                       {link.label}
                     </EditableText>
                     <EditableText
                       section="footer"
-                      path={["navigationLinks", idx, "href"]}
+                      path={["navigationLinks", i, "href"]}
                       value={link.href}
-                      onSave={(v) => save(["navigationLinks", idx, "href"], v)}
-                      onCancel={() => {}}
-                      className="text-xs text-white/60 ml-2"
+                      onSave={(v) => handleTextSave(["navigationLinks", i, "href"], v)}
+                      onCancel={handleCancel}
+                      className="text-xs text-white/50 ml-2"
                     >
                       → {link.href}
                     </EditableText>
@@ -208,30 +223,30 @@ export default function Footer() {
           </nav>
         </div>
 
-        {/* Right Section - Contact & Careers */}
+        {/* Right Column */}
         <div className="lg:col-span-1 lg:text-right">
           <nav className="space-y-4 lg:flex lg:flex-col lg:items-end">
-            {data.rightLinks.map((link, idx) => (
-              <div key={idx} className="block">
+            {data.rightLinks.map((link, i) => (
+              <div key={i}>
                 {isCms ? (
                   <>
                     <EditableText
                       section="footer"
-                      path={["rightLinks", idx, "label"]}
+                      path={["rightLinks", i, "label"]}
                       value={link.label}
-                      onSave={(v) => save(["rightLinks", idx, "label"], v)}
-                      onCancel={() => {}}
-                      className="text-[#f5a742] hover:text-[#ffb855] transition-colors text-base lg:text-lg font-light border-b border-[#f5a742] pb-1 w-fit block"
+                      onSave={(v) => handleTextSave(["rightLinks", i, "label"], v)}
+                      onCancel={handleCancel}
+                      className="block text-[#f5a742] hover:text-[#ffb855] transition-colors text-base lg:text-lg font-light border-b border-[#f5a742] pb-1 w-fit"
                     >
                       {link.label}
                     </EditableText>
                     <EditableText
                       section="footer"
-                      path={["rightLinks", idx, "href"]}
+                      path={["rightLinks", i, "href"]}
                       value={link.href}
-                      onSave={(v) => save(["rightLinks", idx, "href"], v)}
-                      onCancel={() => {}}
-                      className="text-xs text-white/60 ml-2"
+                      onSave={(v) => handleTextSave(["rightLinks", i, "href"], v)}
+                      onCancel={handleCancel}
+                      className="text-xs text-white/50 ml-2"
                     >
                       → {link.href}
                     </EditableText>
@@ -258,21 +273,14 @@ export default function Footer() {
               section="footer"
               path={["logoSrc"]}
               src={data.logoSrc}
-              alt="IRIS LOGO"
+              alt="IRIS Logo"
               width={120}
               height={39}
-              className="object-contain"
-              onSave={(v) => save(["logoSrc"], v)}
-              onCancel={() => {}}
+              onSave={handleImageSave}
+              onCancel={handleCancel}
             />
           ) : (
-            <Image
-              src={data.logoSrc}
-              alt="IRIS LOGO"
-              title="IRIS LOGO"
-              width={120}
-              height={39}
-            />
+            <Image src={data.logoSrc} alt="IRIS Logo" width={120} height={39} />
           )}
         </div>
 
@@ -281,35 +289,32 @@ export default function Footer() {
             section="footer"
             path={["description"]}
             value={data.description}
-            onSave={(v) => save(["description"], v)}
-            onCancel={() => {}}
+            onSave={(v) => handleTextSave(["description"], v)}
+            onCancel={handleCancel}
             className="text-gray-300 leading-relaxed text-sm mb-8"
           >
             {data.description}
           </EditableText>
         ) : (
-          <p className="text-gray-300 leading-relaxed text-sm mb-8">
-            {data.description}
-          </p>
+          <p className="text-gray-300 leading-relaxed text-sm mb-8">{data.description}</p>
         )}
 
         <nav className="space-y-3 mb-8">
-          {[...data.navigationLinks, ...data.rightLinks].map((link, idx) => {
-            const isRight = idx >= data.navigationLinks.length;
-            const arr = isRight ? data.rightLinks : data.navigationLinks;
-            const realIdx = isRight ? idx - data.navigationLinks.length : idx;
-            const pathPrefix = isRight ? ["rightLinks", realIdx] : ["navigationLinks", realIdx];
+          {[...data.navigationLinks, ...data.rightLinks].map((link, i) => {
+            const isRight = i >= data.navigationLinks.length;
+            const idx = isRight ? i - data.navigationLinks.length : i;
+            const pathPrefix = isRight ? ["rightLinks", idx] : ["navigationLinks", idx];
 
             return (
-              <div key={idx}>
+              <div key={i}>
                 {isCms ? (
                   <>
                     <EditableText
                       section="footer"
                       path={[...pathPrefix, "label"]}
                       value={link.label}
-                      onSave={(v) => save([...pathPrefix, "label"], v)}
-                      onCancel={() => {}}
+                      onSave={(v) => handleTextSave([...pathPrefix, "label"], v)}
+                      onCancel={handleCancel}
                       className="block text-[#f5a742] hover:text-[#ffb855] transition-colors text-base font-light border-b border-[#f5a742] pb-1 w-fit"
                     >
                       {link.label}
@@ -318,9 +323,9 @@ export default function Footer() {
                       section="footer"
                       path={[...pathPrefix, "href"]}
                       value={link.href}
-                      onSave={(v) => save([...pathPrefix, "href"], v)}
-                      onCancel={() => {}}
-                      className="text-xs text-white/60 ml-2"
+                      onSave={(v) => handleTextSave([...pathPrefix, "href"], v)}
+                      onCancel={handleCancel}
+                      className="text-xs text-white/50 ml-2"
                     >
                       → {link.href}
                     </EditableText>
@@ -328,7 +333,7 @@ export default function Footer() {
                 ) : (
                   <a
                     href={link.href}
-                    className=" spywareblock text-[#f5a742] hover:text-[#ffb855] transition-colors text-base font-light border-b border-[#f5a742] pb-1 w-fit"
+                    className="block text-[#f5a742] hover:text-[#ffb855] transition-colors text-base font-light border-b border-[#f5a742] pb-1 w-fit"
                   >
                     {link.label}
                   </a>
@@ -338,19 +343,18 @@ export default function Footer() {
           })}
         </nav>
 
-        <div className="flex gap-4">
-          {data.socialLinks.map((social, idx) => (
-            <a
-              key={idx}
-              href={isCms ? undefined : social.url}
-              aria-label={social.platform}
-              className={isCms ? "cursor-default" : "hover:opacity-80 transition-opacity"}
-            >
-              {renderSocialIcon(social.platform)}
-            </a>
-          ))}
+        <div className="flex gap-6">
+          <a href={data.social.facebook} aria-label="Facebook" className="hover:opacity-80 transition">
+            <FacebookIcon />
+          </a>
+          <a href={data.social.twitter} aria-label="Twitter" className="hover:opacity-80 transition">
+            <TwitterIcon />
+          </a>
+          <a href={data.social.instagram} aria-label="Instagram" className="hover:opacity-80 transition">
+            <InstagramIcon />
+          </a>
         </div>
       </div>
-    </div>
+    </footer>
   );
 }

@@ -1,0 +1,13 @@
+{
+  "title": "OUR WHY",
+  "description":
+    "For too long, reproductive health has been framed in a way that feels impersonal and inaccessible. Kenya Creates is here to change that. Our films speak to the heart, addressing the real barriers young people face while providing tools to navigate life with confidence. It’s not about dictating choices; it’s about recognizing what’s real and centering it to spark conversations that feel natural and empowering.",
+  "ctaText": "Check out KENYA CREATES",
+  "ctaUrl": "https://kenyacreates.org",
+  "images": [
+    { "id": 1, "src": "/outdoor.png", "alt": "", "span": "row-span-1 col-span-1" },
+    { "id": 2, "src": "/theatre.png", "alt": "", "span": "row-span-1 col-span-1" },
+    { "id": 3, "src": "/long.png", "alt": "", "span": "row-span-2 col-span-1" },
+    { "id": 4, "src": "/team.png", "alt": "", "span": "row-span-1 col-span-2" }
+  ]
+}

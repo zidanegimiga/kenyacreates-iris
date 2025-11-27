@@ -20,8 +20,9 @@ function deepSet(obj: any, path: (string | number)[], value: any): any {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { section: string } }
+  { params }: { params: Promise<{ section: string }> }
 ) {
+  const { section } = await params;
   const auth = req.headers.get("authorization");
   if (auth !== `Bearer ${process.env.NEXT_PUBLIC_CMS_PASSWORD}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -43,9 +44,9 @@ export async function POST(
     const url = `/uploads/${filename}`;
 
     // Update JSON deeply
-    const data = await getContent(params.section);
+    const data = await getContent(section);
     deepSet(data, pathArr, url);
-    await saveContent(params.section, data);
+    await saveContent(section, data);
 
     return NextResponse.json({ url });
   } catch (err: any) {

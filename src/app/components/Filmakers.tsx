@@ -95,11 +95,6 @@ export default function MeetFilMakers() {
 
   return (
     <section className="relative overflow-hidden px-8 md:px-12 lg:px-28 py-20">
-      <motion.div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-3xl bg-purple-500/30"
-        initial={{ opacity: 0, scale: 0.5 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2 }} />
-      <motion.div className="absolute bottom-0 left-0 w-[300px] h-[300px] rounded-full blur-2xl bg-pink-500/30"
-        initial={{ opacity: 0, scale: 0.5 }} whileInView={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 0.3 }} />
-
       <div className="relative z-10 text-center max-w-[1000px] mx-auto">
         {isCms ? (
           <EditableText
