@@ -1,3 +1,15 @@
-[
-  { "title": "Kenya Creates", "slug": "kenyacreates" }
-]
+{
+  "kenyacreates": {
+    "name": "Kenya Creates",
+    "slug": "kenyacreates",
+    "sections": [
+      "navigation",
+      "hero",
+      "theoryOfChange",
+      "behavioural",
+      "filmmakers",
+      "gallery",
+      "footer"
+    ]
+  }
+}

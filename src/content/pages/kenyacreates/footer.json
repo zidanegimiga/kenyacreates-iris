@@ -1,0 +1,37 @@
+{
+  "logoSrc": "/logo.png",
+  "description": "Together with funders and civil society leaders, we work to strengthen and support networks and initiatives that initiate new conversations and collaborations between independent storytellers and journalists and community-based movements, informed by narrative strategies.",
+  "navigationLinks": [
+    {
+      "label": "The IRIS Story",
+      "href": "https://storyforimpact.io/"
+    },
+    {
+      "label": "Meet the Team",
+      "href": "https://storyforimpact.io/our-voices"
+    },
+    {
+      "label": "Highlighted Projects",
+      "href": "https://storyforimpact.io/projects"
+    },
+    {
+      "label": "IRIS Blog",
+      "href": "https://storyforimpact.io/blog"
+    }
+  ],
+  "rightLinks": [
+    {
+      "label": "Contact",
+      "href": "https://storyforimpact.io/contact"
+    },
+    {
+      "label": "Careers",
+      "href": "https://storyforimpact.io/careers"
+    }
+  ],
+  "social": {
+    "facebook": "https://facebook.com/yourpage",
+    "twitter": "https://twitter.com/yourhandle",
+    "instagram": "https://instagram.com/yourhandle"
+  }
+}

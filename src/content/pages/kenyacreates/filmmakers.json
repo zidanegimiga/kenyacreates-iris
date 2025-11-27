@@ -1,0 +1,38 @@
+{
+  "intro": "Through four captivating short films, we move beyond legalese and jargon to embrace a language that’s deeply personal, relatable, and rooted in our local history.",
+  "title": "Meet the Directors",
+  "makers": [
+    {
+      "id": "adelle",
+      "name": "Adelle Onyango",
+      "imageSrc": "/adele_filmmaker_card.png",
+      "socialUrl": "https://www.instagram.com/adelleonyango/?hl=en",
+      "bgColor": "bg-[#7F3DFF]",
+      "pattern": "/pattern.png"
+    },
+    {
+      "id": "anthony",
+      "name": "Anthony 'Ty' Ngachira",
+      "imageSrc": "/anthony_filmmaker_card.png",
+      "socialUrl": "https://www.instagram.com/anto_ty/?hl=en",
+      "bgColor": "bg-[#D81B60]",
+      "pattern": "/pattern.png"
+    },
+    {
+      "id": "abigael",
+      "name": "Abigael Arunga",
+      "imageSrc": "/abigael_filmmaker_card.png",
+      "socialUrl": "https://www.instagram.com/abigailarunga/?hl=en",
+      "bgColor": "bg-[#FF9800]",
+      "pattern": "/pattern.png"
+    },
+    {
+      "id": "lydia",
+      "name": "Lydia Matata",
+      "imageSrc": "/lydia_filmmaker_card.png",
+      "socialUrl": "https://www.instagram.com/lydiamatata/?hl=en",
+      "bgColor": "bg-[#009688]",
+      "pattern": "/pattern.png"
+    }
+  ]
+}
