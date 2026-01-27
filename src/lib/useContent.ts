@@ -4,7 +4,12 @@
 import { toast } from "react-toastify";
 import { create } from "zustand";
 
-type PendingChange = { page: string; section: string; path: (string | number)[]; value: any };
+type PendingChange = {
+  page?: string;
+  section: string;
+  path: (string | number)[];
+  value: any;
+};
 
 const STORAGE_KEY = "cms-pending";
 
@@ -14,7 +19,6 @@ export const useEditorStore = create<{
   publish: () => Promise<void>;
   reset: () => void;
 }>((set, get) => {
-  // Load from localStorage on init
   const loadPending = (): PendingChange[] => {
     if (typeof window === "undefined") return [];
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -24,9 +28,13 @@ export const useEditorStore = create<{
   return {
     pending: loadPending(),
 
-    add: (change) =>
+    add: (change) => {
+      if (!Array.isArray(change.path)) {
+        console.error("Invalid path detected:", change.path);
+        return;
+      }
+
       set((state) => {
-        // Replace existing change by same page+section+path
         const newPending = [
           ...state.pending.filter(
             (c) =>
@@ -34,61 +42,97 @@ export const useEditorStore = create<{
                 c.page === change.page &&
                 c.section === change.section &&
                 JSON.stringify(c.path) === JSON.stringify(change.path)
-              )
+              ),
           ),
           change,
         ];
-        // Save to localStorage
         localStorage.setItem(STORAGE_KEY, JSON.stringify(newPending));
-        console.log("Queued change:", change); // Debug
-        toast.info(`Queued change: ${change.section}.${change.path.join(".")}`);
         return { pending: newPending };
-      }),
+      });
+    },
 
     publish: async () => {
       const { pending } = get();
-      if (pending.length === 0) {
-        toast.info("No changes to publish!");
-        return;
-      }
+      if (pending.length === 0) return;
 
-      // Group by page + section
-      const groups: Record<string, { page: string; section: string; updates: any[] }> = {};
-      for (const p of pending) {
-        const key = `${p.page}:::${p.section}`;
-        if (!groups[key]) groups[key] = { page: p.page, section: p.section, updates: [] };
-        groups[key].updates.push({ path: p.path, value: p.value });
-      }
+      toast.info("Uploading images and saving content...");
 
       try {
-        await Promise.all(
-          Object.values(groups).map(({ page, section, updates }) =>
-            fetch(`/api/content/${encodeURIComponent(page)}/${encodeURIComponent(section)}`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_CMS_PASSWORD || "kenyacreates2025"}`,
-              },
-              body: JSON.stringify(updates),
-            }).then(async (r) => {
-              if (!r.ok) {
-                const err = await r.json().catch(() => ({ error: r.statusText }));
-                throw new Error(`Failed to save ${section} on page ${page}: ${err.error || r.statusText}`);
+        const processedPending = await Promise.all(
+          pending.map(async (change) => {
+            if (
+              typeof change.value === "string" &&
+              change.value.startsWith("data:image")
+            ) {
+              const res = await fetch(change.value);
+              const blob = await res.blob();
+              const file = new File([blob], "upload.png", { type: blob.type });
+
+              const formData = new FormData();
+              formData.append("file", file);
+              formData.append("path", JSON.stringify(change.path));
+              formData.append("page", change.page || "");
+
+              const uploadRes = await fetch(
+                `/api/content/${change.page}/${change.section}/upload`,
+                {
+                  method: "POST",
+                  headers: {
+                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_CMS_PASSWORD || "kenyacreates2025"}`,
+                  },
+                  body: formData,
+                },
+              );
+
+              if (uploadRes.ok) {
+                const { url } = await uploadRes.json();
+                return { ...change, value: url };
+              } else {
+                throw new Error(`Image upload failed for ${change.section}`);
               }
-              console.log(`Saved ${section} for page ${page}`); // Debug
-            })
-          )
+            }
+            return change;
+          }),
         );
 
-        // Clear pending & localStorage
+        const groups: Record<string, any> = {};
+        for (const p of processedPending) {
+          const key = `${p.page}:::${p.section}`;
+          if (!groups[key]) {
+            groups[key] = {
+              page: p.page ?? "",
+              section: p.section,
+              updates: [],
+            };
+          }
+          groups[key].updates.push({ path: p.path, value: p.value });
+        }
+
+        await Promise.all(
+          Object.values(groups).map(({ page, section, updates }) =>
+            fetch(
+              `/api/content/${encodeURIComponent(page)}/${encodeURIComponent(section)}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${process.env.NEXT_PUBLIC_CMS_PASSWORD || "kenyacreates2025"}`,
+                },
+                body: JSON.stringify(updates),
+              },
+            ).then(async (r) => {
+              if (!r.ok) throw new Error(`Save failed for ${section}`);
+            }),
+          ),
+        );
+
         localStorage.removeItem(STORAGE_KEY);
         set({ pending: [] });
-        toast.success("All changes published successfully! Refreshing...");
-        // Reload to pick up new content from files
+        toast.success("Published successfully!");
         window.location.reload();
       } catch (err: any) {
-        console.error("Publish error:", err); // Debug
-        toast.error(`Publish failed: ${err.message}. Check console.`);
+        console.error("Publish error:", err);
+        toast.error(`Publish failed: ${err.message}`);
       }
     },
 
