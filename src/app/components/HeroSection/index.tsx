@@ -83,30 +83,26 @@ export default function HeroSection() {
     add({ section: "hero", path, value: newValue });
   };
 
+
   const handleImageSave = (path: (string | number)[], newUrl: string) => {
-    setData((prev) => {
-      const newData = { ...prev };
-      let node = newData;
-      for (let i = 0; i < path.length - 1; i++) {
-        // @ts-ignore
-        node = node[path[i]] as any;
-      }
-      // @ts-ignore
-      node[path[path.length - 1]] = newUrl;
-      return newData;
-    });
-    add({ section: "hero", path, value: newUrl });
-  };
+  setData((prev) => {
+    const newData = JSON.parse(JSON.stringify(prev));
+    let node = newData;
+    
+    for (let i = 0; i < path.length - 1; i++) {
+      node = node[path[i]];
+    }
+    
+    node[path[path.length - 1]] = newUrl;
+    return newData;
+  });
+};
 
   const handleCancel = () => {
-    // No-op for now; could revert local state if needed
   };
 
   return (
     <div className="w-full text-center">
-      {/* -------------------------------------------------
-          Top Intro Text
-      ------------------------------------------------- */}
       <motion.div
         className="w-full flex justify-center items-center"
         initial={{ opacity: 0, y: -40 }}
@@ -129,9 +125,6 @@ export default function HeroSection() {
         )}
       </motion.div>
 
-      {/* -------------------------------------------------
-          Sub Text Logo
-      ------------------------------------------------- */}
       <motion.div
         className="flex flex-col items-center justify-center"
         initial={{ opacity: 0, scale: 0.8 }}
@@ -163,9 +156,6 @@ export default function HeroSection() {
         </div>
       </motion.div>
 
-      {/* -------------------------------------------------
-          Hero Image
-      ------------------------------------------------- */}
       <motion.div
         className="w-full flex justify-center items-center p-4 mt-10"
         initial={{ opacity: 0, y: 60 }}
@@ -188,9 +178,6 @@ export default function HeroSection() {
         )}
       </motion.div>
 
-      {/* -------------------------------------------------
-          Paragraph
-      ------------------------------------------------- */}
       <motion.div
         className="w-full flex justify-center items-center"
         initial={{ opacity: 0 }}
@@ -215,9 +202,6 @@ export default function HeroSection() {
         )}
       </motion.div>
 
-      {/* -------------------------------------------------
-          Vision Section
-      ------------------------------------------------- */}
       <motion.section
         className="relative flex flex-col md:flex-row items-center justify-between bg-[#C2670C] text-white overflow-hidden h-[300px] md:h-[500px]"
         initial={{ opacity: 0, x: -80 }}
@@ -312,9 +296,6 @@ export default function HeroSection() {
         </div>
       </motion.section>
 
-      {/* -------------------------------------------------
-          Goal Section
-      ------------------------------------------------- */}
       <motion.div
         className={cn(
           "relative flex flex-col md:flex-row items-center justify-between text-white overflow-hidden py-5 md:py-20 h-auto md:h-[70vh]"
@@ -332,7 +313,7 @@ export default function HeroSection() {
               value={data.goal.videoUrl}
               onSave={(val) => handleTextSave(["goal", "videoUrl"], val)}
               onCancel={handleCancel}
-              className="hidden" // Hidden input for URL editing
+              className="hidden" 
             >
               {data.goal.videoUrl}
             </EditableText>

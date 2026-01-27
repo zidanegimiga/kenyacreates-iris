@@ -15,22 +15,22 @@ export default function KenyaCreatesPage() {
       <div className={cn(styles.heroWrapper, "w-full")}>
         <div className={cn("pt-24", styles.bgWrapper)}>
           <Navigation />
-          {/* <HeroSection /> */}
+          <HeroSection />
         </div>
       </div>
 
-      {/* <TheoryOfChange /> */}
+      <TheoryOfChange />
 
       {/* SECTION FOUR */}
       <div className="w-full">
-        {/* <BehaviouralSection /> */}
+        <BehaviouralSection />
       </div>
       <div className="w-full bg-[#303D40] pt-20 py-16 flex justify-center">
         <MeetFilMakers />
       </div>
       <div className="w-full bg-[#303D40] px-4 sm:px-4 md:px-10 lg:px-16">
         <div className="w-full bg-[#374449] sm:px-4 md:px-12 lg:px-16 sm:py-8 md:py-14 lg:py-22 rounded-lg">
-          {/* <GalleryGrid /> */}
+          <GalleryGrid />
         </div>
       </div>
 
@@ -41,7 +41,7 @@ export default function KenyaCreatesPage() {
             backgroundImage: `url('/footerWave.svg')`,
           }}
         ></div>
-        {/* <Footer /> */}
+        <Footer />
       </div>
     </div>
   );
