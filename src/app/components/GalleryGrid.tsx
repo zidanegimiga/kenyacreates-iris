@@ -91,6 +91,7 @@ export default function GalleryGrid() {
             >
               {isCms ? (
                 <EditableImage
+                page=""
                   section="gallery"
                   path={["images", idx, "src"]}
                   src={img.src}
