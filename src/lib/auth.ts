@@ -3,7 +3,7 @@
 
 const USERS = {
   admin: "neon-rhino-77-horizon",
-  mira: "velvet-forest-pulse-2026",
+  mia: "velvet-forest-pulse-2026",
 };
 
 const AUTH_KEY = "cms-active-session";
