@@ -1,24 +1,55 @@
 // src/lib/auth.ts
 "use client";
 
-const ADMIN_PASSWORD = "kenyacreates2025"; // ← change this!
-const AUTH_KEY = "cms-admin-auth";
+const USERS = {
+  admin: "neon-rhino-77-horizon",
+  mira: "velvet-forest-pulse-2026",
+};
 
-export const login = (password: string): boolean => {
-  if (password === ADMIN_PASSWORD) {
+const AUTH_KEY = "cms-active-session";
+
+/**
+ * Validates credentials and persists session
+ * @param username - The identity of the user
+ * @param password - The secret key
+ */
+export const login = (username: string, password: string): boolean => {
+  const normalizedUser = username.toLowerCase() as keyof typeof USERS;
+  const validPassword = USERS[normalizedUser];
+
+  if (validPassword && password === validPassword) {
     if (typeof window !== "undefined") {
-      localStorage.setItem(AUTH_KEY, "true");
+      // Store the username so the UI knows who is logged in
+      localStorage.setItem(AUTH_KEY, username);
     }
     return true;
   }
+  
   return false;
 };
 
+/**
+ * Clears the session from local storage
+ */
 export const logout = () => {
-  localStorage.removeItem(AUTH_KEY);
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(AUTH_KEY);
+  }
   return true;
 };
 
+/**
+ * Checks if a valid session exists
+ */
 export const isAuthenticated = (): boolean => {
-  return typeof window !== "undefined" && localStorage.getItem(AUTH_KEY) === "true";
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(AUTH_KEY) !== null;
+};
+
+/**
+ * Retrieves the currently logged-in username
+ */
+export const getActiveUser = (): string | null => {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(AUTH_KEY);
 };
