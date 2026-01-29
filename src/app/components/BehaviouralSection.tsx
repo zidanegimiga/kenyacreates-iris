@@ -41,17 +41,30 @@ export default function BehaviouralSection() {
   const [data, setData] = useState<BehaviouralData>(defaultData);
   const [isCms, setIsCms] = useState(false);
   const { add } = useEditorStore();
+  const [currentPage, setCurrentPage] = useState("");
 
   useEffect(() => {
+    const getPageFromPath = () => {
+      if (typeof window === "undefined") return "kenyacreates";
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      // if editing via /cms/editor, optionally check a query param ?page=kenyacreates, but fallback:
+      if (parts[0] === "cms") {
+        // you might put the page slug in query or default to kenyacreates for now
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("page") || "kenyacreates";
+      }
+      return parts[0] || "kenyacreates";
+    };
+
+    const page = getPageFromPath();
+    setCurrentPage(page);
+
     const load = async () => {
       try {
-        const res = await fetch("/api/content/behavioural");
-        if (res.ok) {
-          const json = await res.json();
-          setData(json);
-        }
-      } catch (e) {
-        console.warn("Using default behavioural content");
+        const res = await fetch(`/api/content/${page}/behavioural`);
+        if (res.ok) setData(await res.json());
+      } catch {
+        console.warn("Using default behavioural");
       }
     };
     load();
@@ -60,13 +73,19 @@ export default function BehaviouralSection() {
 
   const saveText = (path: (string | number)[], value: string) => {
     setData((prev) => {
-      const copy = { ...prev };
-      let node: any = copy;
+      const copy: any = JSON.parse(JSON.stringify(prev));
+      let node = copy;
       for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
       node[path[path.length - 1]] = value;
       return copy;
     });
-    add({ section: "behavioural", path, value });
+
+    add({
+      page: currentPage,
+      section: "behavioural",
+      path,
+      value,
+    });
   };
 
   return (
@@ -81,6 +100,7 @@ export default function BehaviouralSection() {
       <div className="relative z-10 w-full px-8 md:px-16 py-20">
         {isCms ? (
           <EditableText
+            page={currentPage}
             section="behavioural"
             path={["heading1"]}
             value={data.heading1}
@@ -104,6 +124,7 @@ export default function BehaviouralSection() {
 
         {isCms ? (
           <EditableText
+            page={currentPage}
             section="behavioural"
             path={["heading2"]}
             value={data.heading2}
@@ -134,8 +155,8 @@ export default function BehaviouralSection() {
               idx === 0
                 ? "border-l-0 md:border-t md:border-b border-y-1"
                 : idx === 1
-                ? "border-y-1"
-                : "border-r-0"
+                  ? "border-y-1"
+                  : "border-r-0"
             }`}
             initial={{ y: 50, opacity: 0, clipPath: "inset(0 100% 0 0)" }}
             whileInView={{
@@ -153,6 +174,7 @@ export default function BehaviouralSection() {
             {isCms ? (
               <>
                 <EditableText
+                  page={currentPage}
                   section="behavioural"
                   path={["cards", idx, "title"]}
                   value={card.title}
@@ -164,6 +186,7 @@ export default function BehaviouralSection() {
                 </EditableText>
 
                 <EditableText
+                  page={currentPage}
                   section="behavioural"
                   path={["cards", idx, "text"]}
                   value={card.text}
