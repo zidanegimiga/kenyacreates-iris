@@ -29,13 +29,11 @@ const defaultData: HeroData = {
     "Kenya Creates is a storytelling initiative dedicated to reimagining how Kenyan youth talk about their bodies and health. We move beyond legalese and jargon to embrace a language that’s deeply personal, relatable, and rooted in our local history.",
   vision: {
     title: "OUR VISION",
-    text:
-      "We believe young people deserve to lead conversations about their lives. By shifting the focus from policy-driven rhetoric to authentic, human stories, we center the real emotions of grappling with love, sex, relationships, and body issues from the Kenyan youth perspective. This shift moves the conversation to higher ground.",
+    text: "We believe young people deserve to lead conversations about their lives. By shifting the focus from policy-driven rhetoric to authentic, human stories, we center the real emotions of grappling with love, sex, relationships, and body issues from the Kenyan youth perspective. This shift moves the conversation to higher ground.",
   },
   goal: {
     title: "OUR Goal",
-    text:
-      "Kenya Creates is building a bridge between what’s unsaid and what needs to be shared. Our goal is simple: to create a culture where health, love, and self-respect are celebrated without judgment.",
+    text: "Kenya Creates is building a bridge between what’s unsaid and what needs to be shared. Our goal is simple: to create a culture where health, love, and self-respect are celebrated without judgment.",
     videoUrl: "https://www.youtube.com/watch?v=Gw1OQESCbzw",
   },
   images: { visionBg: "/vision.png", visionFg: "/group.png" },
@@ -44,16 +42,32 @@ const defaultData: HeroData = {
 export default function HeroSection() {
   const [data, setData] = useState<HeroData>(defaultData);
   const [isCms, setIsCms] = useState(false);
+
   const { add } = useEditorStore();
+  const [currentPage, setCurrentPage] = useState("");
 
   // -------------------------------------------------
   // Load content + detect CMS mode
   // -------------------------------------------------
   useEffect(() => {
+    // 1. Get page from path (Helper logic)
+    const getPageFromPath = () => {
+      if (typeof window === "undefined") return "kenyacreates";
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      if (parts[0] === "cms") {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("page") || "kenyacreates";
+      }
+      return parts[0] || "kenyacreates";
+    };
+
+    const page = getPageFromPath();
+    setCurrentPage(page);
+
     const load = async () => {
       try {
-        const res = await fetch("/api/content/hero");
-        console.log("HIT DIFFERENT ENDPOINT");
+        // 2. Updated Fetch Path
+        const res = await fetch(`/api/content/${page}/hero`);
         if (res.ok) {
           const json = await res.json();
           setData(json);
@@ -63,43 +77,33 @@ export default function HeroSection() {
       }
     };
     load();
-
-    // Detect if we are inside the CMS editor
     setIsCms(window.location.pathname.startsWith("/cms"));
   }, []);
 
   const handleTextSave = (path: (string | number)[], newValue: string) => {
     setData((prev) => {
-      const newData = { ...prev };
+      const newData = JSON.parse(JSON.stringify(prev));
       let node = newData;
-      for (let i = 0; i < path.length - 1; i++) {
-        // @ts-ignore
-        node = node[path[i]] as any;
-      }
-      // @ts-ignore
+      for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
       node[path[path.length - 1]] = newValue;
       return newData;
     });
-    add({ section: "hero", path, value: newValue });
+    // 3. FIX: Include page: currentPage
+    add({ page: currentPage, section: "hero", path, value: newValue });
   };
-
 
   const handleImageSave = (path: (string | number)[], newUrl: string) => {
-  setData((prev) => {
-    const newData = JSON.parse(JSON.stringify(prev));
-    let node = newData;
-    
-    for (let i = 0; i < path.length - 1; i++) {
-      node = node[path[i]];
-    }
-    
-    node[path[path.length - 1]] = newUrl;
-    return newData;
-  });
-};
-
-  const handleCancel = () => {
+    setData((prev) => {
+      const newData = JSON.parse(JSON.stringify(prev));
+      let node = newData;
+      for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
+      node[path[path.length - 1]] = newUrl;
+      return newData;
+    });
+    // 4. FIX: Must call add() for images to actually save!
+    add({ page: currentPage, section: "hero", path, value: newUrl });
   };
+  const handleCancel = () => {};
 
   return (
     <div className="w-full text-center">
@@ -111,6 +115,7 @@ export default function HeroSection() {
       >
         {isCms ? (
           <EditableImage
+            page={currentPage}
             section="hero"
             path={["initialText"]}
             src={data.initialText}
@@ -134,6 +139,7 @@ export default function HeroSection() {
         <div className="inline-block">
           {isCms ? (
             <EditableImage
+              page={currentPage}
               section="hero"
               path={["logo"]}
               src={data.logo}
@@ -164,6 +170,7 @@ export default function HeroSection() {
       >
         {isCms ? (
           <EditableImage
+            page={currentPage}
             section="hero"
             path={["heroImage"]}
             src={data.heroImage}
@@ -186,6 +193,7 @@ export default function HeroSection() {
       >
         {isCms ? (
           <EditableText
+            page={currentPage}
             section="hero"
             path={["paragraph"]}
             value={data.paragraph}
@@ -213,6 +221,7 @@ export default function HeroSection() {
           {isCms ? (
             <>
               <EditableText
+                page={currentPage}
                 section="hero"
                 path={["vision", "title"]}
                 value={data.vision.title}
@@ -225,6 +234,7 @@ export default function HeroSection() {
               </EditableText>
 
               <EditableText
+                page={currentPage}
                 section="hero"
                 path={["vision", "text"]}
                 value={data.vision.text}
@@ -253,6 +263,7 @@ export default function HeroSection() {
         <div className="w-full md:w-3/5 h-full relative">
           {isCms ? (
             <EditableImage
+              page={currentPage}
               section="hero"
               path={["images", "visionBg"]}
               src={data.images.visionBg}
@@ -280,6 +291,7 @@ export default function HeroSection() {
           >
             {isCms ? (
               <EditableImage
+                page={currentPage}
                 section="hero"
                 path={["images", "visionFg"]}
                 src={data.images.visionFg}
@@ -290,7 +302,12 @@ export default function HeroSection() {
                 onCancel={handleCancel}
               />
             ) : (
-              <Image src={data.images.visionFg} alt="Vision foreground" width={696} height={494} />
+              <Image
+                src={data.images.visionFg}
+                alt="Vision foreground"
+                width={696}
+                height={494}
+              />
             )}
           </motion.div>
         </div>
@@ -298,28 +315,35 @@ export default function HeroSection() {
 
       <motion.div
         className={cn(
-          "relative flex flex-col md:flex-row items-center justify-between text-white overflow-hidden py-5 md:py-20 h-auto md:h-[70vh]"
+          "relative flex flex-col md:flex-row items-center justify-between text-white overflow-hidden py-5 md:py-20 h-auto md:h-[70vh]",
         )}
         initial={{ opacity: 0, y: 80 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
         viewport={{ once: true }}
       >
-        <div className="w-full md:w-1/2 px-2 md:px-10 py-2 md:py-5">
-          {isCms ? (
-            <EditableText
-              section="hero"
-              path={["goal", "videoUrl"]}
-              value={data.goal.videoUrl}
-              onSave={(val) => handleTextSave(["goal", "videoUrl"], val)}
-              onCancel={handleCancel}
-              className="hidden" 
-            >
-              {data.goal.videoUrl}
-            </EditableText>
-          ) : null}
-          <VideoPlayer url={data.goal.videoUrl} className="w-full" />
-        </div>
+<div className="w-full md:w-1/2 px-2 md:px-10 py-2 md:py-5">
+  {isCms && (
+    <div className="mb-4 p-3 bg-slate-900/50 rounded-lg border border-teal-500/30 text-left">
+      <label className="block text-[10px] font-bold text-teal-400 uppercase tracking-widest mb-1">
+        YouTube Video URL
+      </label>
+      <EditableText
+        page={currentPage}
+        section="hero"
+        path={["goal", "videoUrl"]}
+        value={data.goal.videoUrl}
+        onSave={(val) => handleTextSave(["goal", "videoUrl"], val)}
+        onCancel={handleCancel}
+        className="text-xs text-white break-all cursor-pointer hover:text-teal-400"
+      >
+        {data.goal.videoUrl}
+      </EditableText>
+    </div>
+  )}
+  
+  <VideoPlayer url={data.goal.videoUrl} className="w-full" />
+</div>
 
         <motion.div
           className="w-full md:w-1/2 z-10 p-4 md:p-6 md:pt-16 md:pl-12 flex flex-col justify-center h-full"
@@ -331,6 +355,7 @@ export default function HeroSection() {
           {isCms ? (
             <>
               <EditableText
+                page={currentPage}
                 section="hero"
                 path={["goal", "title"]}
                 value={data.goal.title}
@@ -343,6 +368,7 @@ export default function HeroSection() {
               </EditableText>
 
               <EditableText
+                page={currentPage}
                 section="hero"
                 path={["goal", "text"]}
                 value={data.goal.text}
