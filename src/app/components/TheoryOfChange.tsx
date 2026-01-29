@@ -31,15 +31,25 @@ export default function TheoryOfChange() {
   const [data, setData] = useState<TheoryData>(defaultData);
   const [isCms, setIsCms] = useState(false);
   const { add } = useEditorStore();
+  const [currentPage, setCurrentPage] = useState("");
 
-  // -------------------------------------------------
-  // Load content + detect CMS mode
-  // -------------------------------------------------
   useEffect(() => {
+    const getPageFromPath = () => {
+      if (typeof window === "undefined") return "kenyacreates";
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      if (parts[0] === "cms") {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("page") || "kenyacreates";
+      }
+      return parts[0] || "kenyacreates";
+    };
+
+    const page = getPageFromPath();
+    setCurrentPage(page);
+
     const load = async () => {
       try {
-        const res = await fetch("/api/content/theoryofchange");
-        console.log("Loaded theoryofchange content");
+        const res = await fetch(`/api/content/${page}/theoryofchange`);
         if (res.ok) {
           const json = await res.json();
           setData(json);
@@ -49,37 +59,31 @@ export default function TheoryOfChange() {
       }
     };
     load();
-
-    // Detect if we are inside the CMS editor
     setIsCms(window.location.pathname.startsWith("/cms"));
   }, []);
 
   const handleTextSave = (path: (string | number)[], newValue: string) => {
     setData((prev) => {
-      const newData = { ...prev };
+      const newData = JSON.parse(JSON.stringify(prev));
       let node = newData;
-      for (let i = 0; i < path.length - 1; i++) {
-        // @ts-ignore
-        node = node[path[i]] as any;
-      }
-      // @ts-ignore
+      for (let i = 0; i < path.length - 1; i++) node = node[path[i]];
       node[path[path.length - 1]] = newValue;
       return newData;
     });
-    add({ section: "theoryofchange", path, value: newValue });
+    add({
+      page: currentPage,
+      section: "theoryofchange",
+      path,
+      value: newValue,
+    });
   };
 
   const handleImageSave = (path: (string | number)[], newUrl: string) => {
-    setData((prev) => ({
-      ...prev,
-      image: newUrl,
-    }));
-    add({ section: "theoryofchange", path, value: newUrl });
+    setData((prev) => ({ ...prev, image: newUrl }));
+    add({ page: currentPage, section: "theoryofchange", path, value: newUrl });
   };
 
-  const handleCancel = () => {
-    // No-op for now; could revert local state if needed
-  };
+  const handleCancel = () => {};
 
   return (
     <div className="w-full flex flex-col lg:flex-row justify-center items-stretch overflow-hidden">
@@ -87,7 +91,7 @@ export default function TheoryOfChange() {
       <motion.div
         className={cn(
           "w-full lg:w-1/2 bg-cover bg-center relative grayscale hover:grayscale-0 h-[70vh] lg:h-screen",
-          isCms ? "" : "bg-[url('/theoryofchange.jpg')]"
+          isCms ? "" : "bg-[url('/theoryofchange.jpg')]",
         )}
         style={isCms ? { backgroundImage: `url(${data.image})` } : {}}
         initial={{ opacity: 0, scale: 1.2, x: -80 }}
@@ -97,6 +101,7 @@ export default function TheoryOfChange() {
       >
         {isCms ? (
           <EditableImage
+            page={currentPage}
             section="theoryofchange"
             path={["image"]}
             src={data.image}
@@ -117,6 +122,7 @@ export default function TheoryOfChange() {
         >
           {isCms ? (
             <EditableText
+              page={currentPage}
               section="theoryofchange"
               path={["photoCredit"]}
               value={data.photoCredit}
@@ -144,6 +150,7 @@ export default function TheoryOfChange() {
         >
           {isCms ? (
             <EditableText
+              page={currentPage}
               section="theoryofchange"
               path={["title"]}
               value={data.title}
@@ -169,6 +176,7 @@ export default function TheoryOfChange() {
 
           {isCms ? (
             <EditableText
+              page={currentPage}
               section="theoryofchange"
               path={["firstParagraph"]}
               value={data.firstParagraph}
@@ -201,6 +209,7 @@ export default function TheoryOfChange() {
         >
           {isCms ? (
             <EditableText
+              page={currentPage}
               section="theoryofchange"
               path={["secondParagraph"]}
               value={data.secondParagraph}
